@@ -216,6 +216,7 @@
       - [Raspberry Pi 2/3/4 PilotPi](flight_controller/raspberry_pi_pilotpi.md)
         - [PilotPi with Raspberry Pi OS](flight_controller/raspberry_pi_pilotpi_rpios.md)
         - [PilotPi with Ubuntu Server](flight_controller/raspberry_pi_pilotpi_ubuntu_server.md)
+      - [GMRC GREATMOUNTAINF435](flight_controller/gmrc_greatmountain_f435.md)
     - [Discontinued Autopilots/Vehicles](flight_controller/autopilot_discontinued.md)
     - [Pixhawk Autopilot Bus (PAB) & Carriers](flight_controller/pixhawk_autopilot_bus.md)
       - [ARK Electronics Pixhawk Autopilot Bus Carrier](flight_controller/ark_pab.md)

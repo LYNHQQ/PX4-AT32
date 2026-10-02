@@ -73,6 +73,7 @@ seeders:
   kinetis: "nxp_fmuk66-v3_default"
   s32k: "nxp_mr-canhubk3_default"
   rp2040: "raspberrypi_pico_default"
+  at32: "gmrc_greatmountain-f435_default"
   special: "px4_fmu-v6x_default"
   native: "px4_sitl_default"
   voxl2: "modalai_voxl2_default"

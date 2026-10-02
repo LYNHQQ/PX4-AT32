@@ -8,6 +8,7 @@ the way the workflow does and check its output against the board tree.
 """
 
 import json
+import re
 import subprocess
 import sys
 import unittest
@@ -91,6 +92,51 @@ class BuildMatrixTest(unittest.TestCase):
                 continue
             with self.subTest(group=g['group']):
                 self.assertIn(g['cache_prefix'], seeded)
+
+    def test_board_group_matches_its_nuttx_chip_family(self):
+        # a chip family that the mapping in loadconfig.py does not know about
+        # silently degrades to 'native', so the board joins another family's
+        # group without any other test noticing
+        family_of = {t: g['chip_family'] for g in self.groups for t in g['targets']}
+        checked = 0
+        for px4board in BOARDS.glob('*/*/*.px4board'):
+            manufacturer, board = px4board.parts[-3], px4board.parts[-2]
+            label = px4board.name[:-len('.px4board')]
+            target = '_'.join((manufacturer, board, label))
+            family = family_of.get(target)
+            if family is None or family == 'special':
+                continue  # not built by CI, or isolated by label
+            expected = reference_chip_family(px4board.parent)
+            if expected is None:
+                continue  # not a NuttX board, so no chip family to map
+            with self.subTest(target=target):
+                self.assertEqual(family, expected)
+            checked += 1
+        self.assertGreater(checked, 100)
+
+
+def reference_chip_family(board_dir):
+    """Chip family of a board, reimplemented from loadconfig.py's contract.
+
+    Returns None for boards without a NuttX arch chip (posix/qurt targets).
+    """
+    text = None
+    for name in ('nsh', 'bootloader'):
+        defconfig = board_dir / 'nuttx-config' / name / 'defconfig'
+        if defconfig.is_file():
+            text = defconfig.read_text()
+            break
+    if text is None:
+        return None
+    match = re.search(r'^CONFIG_ARCH_CHIP="([^"]+)"', text, re.MULTILINE)
+    if match is None:
+        return None
+    arch_chip = match.group(1)
+    if arch_chip.startswith('s32k'):
+        return 's32k'
+    if arch_chip == 'stm32':
+        return 'stm32f1' if re.search(r'^CONFIG_ARCH_CHIP_STM32F1', text, re.MULTILINE) else 'stm32f4'
+    return arch_chip
 
 
 if __name__ == '__main__':

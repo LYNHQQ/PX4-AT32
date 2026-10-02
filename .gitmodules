@@ -12,8 +12,8 @@
 	branch = main
 [submodule "platforms/nuttx/NuttX/nuttx"]
 	path = platforms/nuttx/NuttX/nuttx
-	url = https://github.com/PX4/NuttX.git
-	branch = px4_firmware_nuttx-12.12.0+
+	url = https://github.com/LYNHQQ/PX4-AT32.git
+	branch = nuttx/at32f435
 [submodule "platforms/nuttx/NuttX/apps"]
 	path = platforms/nuttx/NuttX/apps
 	url = https://github.com/PX4/NuttX-apps.git

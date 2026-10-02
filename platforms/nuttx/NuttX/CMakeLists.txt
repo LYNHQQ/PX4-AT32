@@ -68,6 +68,25 @@ add_custom_command(
 	#USES_TERMINAL
 )
 
+# MSYS uses copied directory links. Refresh the AT32 chip copy when its
+# original sources change so the native build cannot reuse stale drivers.
+set(nuttx_context_source_files)
+if(CONFIG_ARCH_CHIP STREQUAL "at32" AND CMAKE_HOST_SYSTEM_NAME MATCHES "^(MSYS|Windows|CYGWIN)$")
+	file(GLOB_RECURSE nuttx_context_source_files CONFIGURE_DEPENDS LIST_DIRECTORIES false
+		${NUTTX_DIR}/arch/arm/src/at32/*.c
+		${NUTTX_DIR}/arch/arm/src/at32/*.h
+	)
+endif()
+
+# AT32 wrappers include chip implementation files. Generate their kernel
+# dependencies before building libraries, including after clean_context.
+set(nuttx_kernel_dependency_command)
+if(CONFIG_ARCH_CHIP STREQUAL "at32")
+	set(nuttx_kernel_dependency_command
+		COMMAND make --no-print-directory --silent pass2dep > ${CMAKE_CURRENT_BINARY_DIR}/nuttx_kernel_dependencies.log
+	)
+endif()
+
 # context (.config -> include/nuttx/config.h, include/nuttx/version.h, dirlinks)
 add_custom_command(
 	OUTPUT ${NUTTX_DIR}/include/nuttx/config.h ${NUTTX_DIR}/include/arch/chip
@@ -75,9 +94,11 @@ add_custom_command(
 	COMMAND ${CMAKE_COMMAND} -E copy_if_different ${CMAKE_CURRENT_BINARY_DIR}/nuttx/Make.defs ${NUTTX_DIR}/Make.defs
 	COMMAND make --no-print-directory --silent clean_context
 	COMMAND make --no-print-directory --silent pass1dep > ${CMAKE_CURRENT_BINARY_DIR}/nuttx_context.log
+	${nuttx_kernel_dependency_command}
 	DEPENDS
 		${CMAKE_CURRENT_BINARY_DIR}/nuttx/Make.defs
 		${NUTTX_DIR}/.config
+		${nuttx_context_source_files}
 	WORKING_DIRECTORY ${NUTTX_DIR}
 	#USES_TERMINAL
 )

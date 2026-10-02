@@ -1,0 +1,31 @@
+#!/bin/sh
+#
+# GREATMOUNTAINF435 onboard sensors.
+
+# Apply after airframe defaults, before the IMU selects its FIFO batch size.
+# 400 Hz keeps the gyro/PID default and 404-byte ICM42688P batches within DMA.
+# Explicitly saved rate selections take precedence over this board default.
+param set-default IMU_GYRO_RATEMAX 400
+
+board_adc start
+
+# Betaflight uses FLU; CW180_DEG_FLIP maps raw data to (x, -y, -z).
+# Both PX4 IMU drivers convert raw FLU data to FRD before applying -R.
+# Converting the Betaflight body frame to FRD gives PX4 ROTATION_ROLL_180 (8).
+# There is one physical IMU; probe the alternatives in sequence.
+if ! icm42688p -s -b 1 -R 8 start
+then
+	bmi270 -s -b 1 -R 8 start
+fi
+
+# Board revisions fit either a DPS310 or a BMP280 on I2C3.
+if ! dps310 -I -b 3 -a 118 start
+then
+	if ! dps310 -I -b 3 -a 119 start
+	then
+		if ! bmp280 -I -b 3 -a 118 start
+		then
+			bmp280 -I -b 3 -a 119 start
+		fi
+	fi
+fi

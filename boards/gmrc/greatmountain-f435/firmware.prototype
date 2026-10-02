@@ -1,0 +1,13 @@
+{
+    "board_id": 0,
+    "magic": "PX4FWv1",
+    "description": "Experimental firmware for GMRC GREATMOUNTAINF435 (experimental board ID)",
+    "image": "",
+    "build_time": 0,
+    "summary": "GMRC GREATMOUNTAINF435",
+    "version": "0.1",
+    "image_size": 0,
+    "image_maxsize": 4055040,
+    "git_identity": "",
+    "board_revision": 0
+}

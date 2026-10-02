@@ -1,0 +1,119 @@
+/****************************************************************************
+ *
+ *   Copyright (c) 2026 PX4 Development Team. All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ *
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in
+ *    the documentation and/or other materials provided with the
+ *    distribution.
+ * 3. Neither the name PX4 nor the names of its contributors may be
+ *    used to endorse or promote products derived from this software
+ *    without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+ * FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+ * COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+ * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
+ * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
+ * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED
+ * AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+ * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
+ * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ *
+ ****************************************************************************/
+
+#pragma once
+
+#include <nuttx/config.h>
+
+/* The board uses an 8 MHz HSE, confirmed by the board owner. */
+#define AT32_BOARD_XTAL 8000000ul
+#define AT32_HSI_FREQUENCY 48000000ul
+#define AT32_LSI_FREQUENCY 40000
+#define AT32_HSE_FREQUENCY AT32_BOARD_XTAL
+#define AT32_LSE_FREQUENCY 32768
+
+#define AT32_PLLCFG_PLLM CRM_PLL_CFG_PLL_MS(1)
+#define AT32_PLLCFG_PLLN CRM_PLL_CFG_PLL_NS(144)
+#define AT32_PLLCFG_PLLP CRM_PLL_CFG_PLL_FR_4
+#define AT32_SYSCLK_FREQUENCY 288000000ul
+#define AT32_HCLK_FREQUENCY AT32_SYSCLK_FREQUENCY
+#define AT32_PCLK1_FREQUENCY (AT32_HCLK_FREQUENCY / 2)
+#define AT32_PCLK2_FREQUENCY (AT32_HCLK_FREQUENCY / 2)
+
+#define AT32_APB1_TIM2_CLKIN (2 * AT32_PCLK1_FREQUENCY)
+#define AT32_APB1_TIM3_CLKIN (2 * AT32_PCLK1_FREQUENCY)
+#define AT32_APB1_TIM4_CLKIN (2 * AT32_PCLK1_FREQUENCY)
+#define AT32_APB1_TIM5_CLKIN (2 * AT32_PCLK1_FREQUENCY)
+#define AT32_APB1_TIM6_CLKIN (2 * AT32_PCLK1_FREQUENCY)
+#define AT32_APB1_TIM7_CLKIN (2 * AT32_PCLK1_FREQUENCY)
+#define AT32_APB1_TIM12_CLKIN (2 * AT32_PCLK1_FREQUENCY)
+#define AT32_APB1_TIM13_CLKIN (2 * AT32_PCLK1_FREQUENCY)
+#define AT32_APB1_TIM14_CLKIN (2 * AT32_PCLK1_FREQUENCY)
+#define AT32_APB2_TIM1_CLKIN (2 * AT32_PCLK2_FREQUENCY)
+#define AT32_APB2_TIM8_CLKIN (2 * AT32_PCLK2_FREQUENCY)
+#define AT32_APB2_TIM9_CLKIN (2 * AT32_PCLK2_FREQUENCY)
+#define AT32_APB2_TIM10_CLKIN (2 * AT32_PCLK2_FREQUENCY)
+#define AT32_APB2_TIM11_CLKIN (2 * AT32_PCLK2_FREQUENCY)
+#define AT32_APB2_TIM20_CLKIN (2 * AT32_PCLK2_FREQUENCY)
+
+#define BOARD_TIM1_FREQUENCY AT32_HCLK_FREQUENCY
+#define BOARD_TIM2_FREQUENCY AT32_HCLK_FREQUENCY
+#define BOARD_TIM3_FREQUENCY AT32_HCLK_FREQUENCY
+#define BOARD_TIM4_FREQUENCY AT32_HCLK_FREQUENCY
+#define BOARD_TIM5_FREQUENCY AT32_HCLK_FREQUENCY
+#define BOARD_TIM6_FREQUENCY AT32_HCLK_FREQUENCY
+#define BOARD_TIM7_FREQUENCY AT32_HCLK_FREQUENCY
+#define BOARD_TIM8_FREQUENCY AT32_HCLK_FREQUENCY
+#define USB_CONFIG_USBDIV CRM_MISC2_USBDIV_6P0
+#define AT32_USB_FREQUENCY (AT32_SYSCLK_FREQUENCY / 6)
+
+#if defined(CONFIG_AT32_OTGFS) && AT32_USB_FREQUENCY != 48000000ul
+#  error "The USB full-speed controller requires a 48 MHz clock"
+#endif
+
+/* USB OTGFS device mode uses PA11 (D-) and PA12 (D+), with the internal PHY.
+ * PA9 and PA10 belong to UART1, so VBUS sensing and the OTG ID pin are disabled.
+ */
+
+#define GPIO_USART1_TX GPIO_USART1_TX_1
+#define GPIO_USART1_RX GPIO_USART1_RX_1
+#define GPIO_USART2_TX GPIO_USART2_TX_1
+#define GPIO_USART2_RX GPIO_USART2_RX_1
+#define GPIO_USART3_TX GPIO_USART3_TX_4
+#define GPIO_USART3_RX GPIO_USART3_RX_4
+#define GPIO_UART4_TX GPIO_UART4_TX_1
+#define GPIO_UART4_RX GPIO_UART4_RX_1
+#define GPIO_UART8_TX GPIO_UART8_TX_2
+#define GPIO_UART8_RX GPIO_UART8_RX_2
+
+#define GPIO_SPI1_SCK GPIO_SPI1_SCK_1
+#define GPIO_SPI1_MISO GPIO_SPI1_MISO_1
+#define GPIO_SPI1_MOSI GPIO_SPI1_MOSI_1
+#define GPIO_SPI2_SCK GPIO_SPI2_SCK_6
+#define GPIO_SPI2_MISO GPIO_SPI2_MISO_4
+#define GPIO_SPI2_MOSI GPIO_SPI2_MOSI_5
+#define GPIO_SPI3_SCK GPIO_SPI3_SCK_2
+#define GPIO_SPI3_MISO GPIO_SPI3_MISO_2
+#define GPIO_SPI3_MOSI GPIO_SPI3_MOSI_2
+
+#define GPIO_I2C3_SCL GPIO_I2C3_SCL_4
+#define GPIO_I2C3_SDA GPIO_I2C3_SDA_3
+
+#define LED_STARTED 0
+#define LED_HEAPALLOCATE 0
+#define LED_IRQSENABLED 0
+#define LED_STACKCREATED 1
+#define LED_INIRQ 2
+#define LED_SIGNAL 2
+#define LED_ASSERTION 2
+#define LED_PANIC 3

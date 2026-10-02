@@ -1,0 +1,21 @@
+#!/bin/sh
+#
+# GREATMOUNTAINF435 factory defaults from the board pin reference.
+
+param set-default BAT1_V_DIV 11
+# Betaflight current scale is mV per 10 A: scale 100 is 100 A/V.
+param set-default BAT1_A_PER_V 100
+
+# There is no onboard magnetometer or supply-valid input in the pin reference.
+param set-default SYS_HAS_MAG 0
+param set-default CBRK_SUPPLY_CHK 894281
+
+# Reserve room for another log even on the 2 MiB M25P16 option.
+param set-default SDLOG_MAX_SIZE 1
+
+# First boot must not require formatting an existing Betaflight flash.
+# Use the persistent file backend automatically when LittleFS is mounted.
+if [ $STORAGE_AVAILABLE = no ]
+then
+	param set-default SYS_DM_BACKEND 1
+fi

@@ -1,0 +1,10 @@
+#!/bin/sh
+# SPI flash is mounted by board_app_initialize, before rcS runs.
+set STORAGE_CHECK no
+if [ -d /fs/microsd ]
+then
+	set STORAGE_AVAILABLE yes
+fi
+
+# PARAM_BACKUP_FILE is left empty: rcS selects the MTD character device when
+# storage is unavailable and parameters_backup.bson when it is available.

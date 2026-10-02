@@ -374,6 +374,7 @@ bootloaders_update: \
 	cuav_x25-mega_bootloader \
 	cubepilot_cubeorange_bootloader \
 	cubepilot_cubeorangeplus_bootloader \
+	gmrc_greatmountain-f435_bootloader \
 	hkust_nxt-dual_bootloader \
 	hkust_nxt-v1_bootloader \
 	holybro_durandal-v1_bootloader \
