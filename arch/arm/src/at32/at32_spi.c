@@ -1518,9 +1518,18 @@ static void spi_exchange(struct spi_dev_s *dev, const void *txbuffer,
 
   DEBUGASSERT(priv != NULL);
 
-  /* Convert the number of word to a number of bytes */
+  /* Fall back to polling if the DMA count or bounce buffer would overflow. */
 
-  size_t nbytes = (priv->nbits > 8) ? nwords << 1 : nwords;
+  size_t wordsize = priv->nbits > 8 ? 2 : 1;
+  if (nwords > (DMA_CNDTR_NDT_MASK >> DMA_CNDTR_NDT_SHIFT) ||
+      (txbuffer && priv->txbuf && nwords > priv->buflen / wordsize) ||
+      (rxbuffer && priv->rxbuf && nwords > priv->buflen / wordsize))
+    {
+      spi_exchange_nodma(dev, txbuffer, rxbuffer, nwords);
+      return;
+    }
+
+  size_t nbytes = nwords * wordsize;
 
 #ifdef CONFIG_AT32_SPI_DMATHRESHOLD
   /* If this is a small SPI transfer, then let spi_exchange_nodma() do the
@@ -1578,14 +1587,13 @@ static void spi_exchange(struct spi_dev_s *dev, const void *txbuffer,
 
       if (txbuffer && priv->txbuf)
         {
-          if (nbytes > priv->buflen)
-            {
-              nbytes = priv->buflen;
-            }
-
           memcpy(priv->txbuf, txbuffer, nbytes);
           txbuffer = priv->txbuf;
-          rxbuffer = rxbuffer ? priv->rxbuf : rxbuffer;
+        }
+
+      if (rxbuffer && priv->rxbuf)
+        {
+          rxbuffer = priv->rxbuf;
         }
 
       spi_modifycr1(priv, 0, SPI_CTRL1_SPIEN);
@@ -1621,7 +1629,7 @@ static void spi_exchange(struct spi_dev_s *dev, const void *txbuffer,
       /* Then wait for each to complete */
 
       ret = spi_dmarxwait(priv);
-      if (ret < 0)
+      if (ret >= 0)
         {
           ret = spi_dmatxwait(priv);
         }

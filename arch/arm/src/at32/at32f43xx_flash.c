@@ -361,7 +361,8 @@ ssize_t up_progmem_write(size_t addr, const void *buf, size_t count)
       putreg16(*hword, addr);
 
   #ifdef AT32_FLASH_BANK2_START
-      flash_sts = (addr < AT32_FLASH_BANK2_START *AT32_FLASH_PAGESIZE) ? \
+      flash_sts = (addr < AT32_FLASH_BASE +
+                   AT32_FLASH_BANK2_START * AT32_FLASH_PAGESIZE) ? \
                   AT32_FLASH_STS : AT32_FLASH_STS2;
   #else
       flash_sts = AT32_FLASH_STS;

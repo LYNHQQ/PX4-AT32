@@ -219,7 +219,7 @@
 #  define AT32_NDMA                     2   /* DMA1-2 */
 #  define AT32_NSPI                     3   /* SPI1-3 */
 #  define AT32_NI2S                     2   /* I2S1-2 (multiplexed with SPI2-3) */
-#  define AT32_NUSART                   6   /* USART1-3 and 6, UART 4-5 */
+#  define AT32_NUSART                   8   /* USART1-3 and 6, UART4-5 and 7-8 */
 #  define AT32_NI2C                     3   /* I2C1-3 */
 #  define AT32_NCAN                     2   /* CAN1-2 */
 #  define AT32_NSDIO                    1   /* SDIO */

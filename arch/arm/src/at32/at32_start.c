@@ -29,6 +29,7 @@
 #include <assert.h>
 #include <debug.h>
 #include <nuttx/init.h>
+#include <arch/barriers.h>
 #include "arm_internal.h"
 #include "itm_syslog.h"
 #include "nvic.h"
@@ -157,6 +158,22 @@ void __start(void)
     }
 
   showprogress('C');
+
+#ifdef CONFIG_ARCH_RAMFUNCS
+  /* Copy RAM functions before early initialization can call them. */
+
+  for (src = (const uint32_t *)_framfuncs,
+       dest = (uint32_t *)_sramfuncs; dest < (uint32_t *)_eramfuncs;
+      )
+    {
+      *dest++ = *src++;
+    }
+
+  /* Complete the writes before fetching instructions from SRAM. */
+
+  UP_DSB();
+  UP_ISB();
+#endif
 
 #ifdef CONFIG_ARCH_PERF_EVENTS
   up_perf_init((void *)AT32_SYSCLK_FREQUENCY);

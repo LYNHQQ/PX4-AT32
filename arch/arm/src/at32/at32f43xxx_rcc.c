@@ -53,6 +53,13 @@
 
 #define HSE_DIVISOR (AT32_HSE_FREQUENCY + 500000) / 1000000
 
+#if defined(CONFIG_AT32_RTC_HSECLOCK) && \
+    !defined(CONFIG_ARCH_BOARD_AT32_CUSTOM_CLOCKCONFIG)
+#  if HSE_DIVISOR < 2 || HSE_DIVISOR > 31
+#    error "HSE RTC clock divider must be between 2 and 31"
+#  endif
+#endif
+
 /****************************************************************************
  * Private Data
  ****************************************************************************/
@@ -671,6 +678,14 @@ static void at32_stdclockconfig(void)
   regval |= CRM_CFG_APB1DIV_2;      /* apb1 div 2 */
   regval &= ~CRM_CFG_APB2DIV_MASK;
   regval |= CRM_CFG_APB2DIV_2;      /* apb2 div 2 */
+
+#ifdef CONFIG_AT32_RTC_HSECLOCK
+  /* Divide HEXT to the 1 MHz input expected by the RTC prescalers. */
+
+  regval &= ~CRM_CFG_ERTCDIV_MASK;
+  regval |= ((HSE_DIVISOR << CRM_CFG_ERTCDIV_SHIFT) & CRM_CFG_ERTCDIV_MASK);
+#endif
+
   putreg32(regval, AT32_CRM_CFG);
 
   /* entry step mode */
@@ -686,6 +701,19 @@ static void at32_stdclockconfig(void)
   regval &= ~CRM_CFG_SCLKSEL_MASK;
   regval |= CRM_CFG_SEL_PLL;
   putreg32(regval, AT32_CRM_CFG);
+
+#if AT32_SYSCLK_FREQUENCY > 108000000ul
+  /* Allow auto step mode to start before polling SCLKSTS (RM 4.1.5).
+   * Switching to PLL above 108 MHz requires 20 NOP instructions.
+   */
+
+  __asm__ __volatile__(
+    "nop\nnop\nnop\nnop\nnop\n"
+    "nop\nnop\nnop\nnop\nnop\n"
+    "nop\nnop\nnop\nnop\nnop\n"
+    "nop\nnop\nnop\nnop\nnop\n"
+    : : : "memory");
+#endif
 
   while ((getreg32(AT32_CRM_CFG) & CRM_CFG_SCLKSTSL_MASK) != \
         CRM_CFG_STS_PLL);

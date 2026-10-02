@@ -5361,12 +5361,9 @@ static void at32_hwinitialize(struct at32_usbdev_s *priv)
 
   /* Deactivate the power down */
 
-  /* In the case of the all others the meaning of the bit is No VBUS
-   * Sense when Set
-   */
+  /* GCCFG bits 18 and 19 are reserved on AT32. */
 
-  regval  = (OTGFS_GCCFG_PWRDWN | OTGFS_GCCFG_VBUSASEN | \
-  OTGFS_GCCFG_VBUSBSEN);
+  regval = OTGFS_GCCFG_PWRDWN;
 
 # ifndef CONFIG_USBDEV_VBUSSENSING
   regval |= OTGFS_GCCFG_NOVBUSSENS;

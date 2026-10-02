@@ -68,6 +68,16 @@ config ARCH_CHIP_AT32F435RG
 
 endchoice # AT32 Chip Selection
 
+config AT32_RAMFUNCS
+	bool "Enable functions in RAM"
+	default n
+	depends on AT32_AT32F435
+	select ARCH_HAVE_RAMFUNCS
+	---help---
+		Enable startup copying of functions placed in SRAM by the board
+		linker script. The script must provide _sramfuncs, _eramfuncs and
+		_framfuncs, with word-aligned section and load addresses.
+
 choice
 	prompt "Override Flash Size Designator"
 	default AT32_FLASH_CONFIG_DEFAULT
